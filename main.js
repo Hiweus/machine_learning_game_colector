@@ -1,3 +1,14 @@
+function end(value){
+    if(value > 0.7){
+        return 1;
+    }else if(value < 0.3){
+        return -1;
+    }else{
+        return 0;
+    }
+}
+
+
 class Neuron{
     constructor(numberOfInputs){
         this.length = numberOfInputs;
@@ -21,7 +32,7 @@ class Neuron{
         for(let i=0;i<this.length;i++){
             out += (this.weigth[i]*inputs[i]);
         }
-        return out;
+        return end(out);
     }
 }
 
@@ -50,44 +61,34 @@ class Layer{
 }
 
 class Network{
-    constructor(numberOfNeurons,numberOfInputs, numberOfLayers){
-        this.length = numberOfLayers;
+    constructor(numberOfInputs, modelLayers){
+        this.length = modelLayers.length;
         this.layers = [];
-        this.end = new Neuron(numberOfNeurons);
-        this.first = new Layer(numberOfNeurons,numberOfInputs);
-        for (let i = 0; i < numberOfLayers; i++) {
-            this.layers.push(new Layer(numberOfNeurons,numberOfNeurons));
-        }
+
+        this.first = new Layer(modelLayers[0],numberOfInputs);
+        this.layers.push(this.first);
+        for (let i = 1; i < modelLayers.length; i++) {
+            this.layers.push(new Layer(modelLayers[i],modelLayers[i-1]));
+        }       
     }
 
     ajust(value){
-        this.first.ajust(value);
         this.layers.forEach(function(element){
             element.ajust(value);
         });
-        this.end.ajust(value);
     }
 
     compute(inputs){
-        let out = this.first.compute(inputs);
-
+        let out = inputs;
         for (let i = 0; i < this.length; i++) {
             out = this.layers[i].compute(out);            
         }
 
-        return this.end.compute(out);
+        return out;
     }
 }
 
-function end(value){
-    if(value > 0.7){
-        return 1;
-    }else if(value < 0.3){
-        return -1;
-    }else{
-        return 0;
-    }
-}
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -176,7 +177,7 @@ function frames(){
         for(let i=0;i<3;i++){
             let out = net.compute([playerPosition.left, itemPosition.left]);
             let erro = key - end(out);
-            erro *= 0.0006; // taxa de aprendizagem da rede
+            erro *= 0.0005; // taxa de aprendizagem da rede
             net.ajust(erro);
         }
     }else{
@@ -192,7 +193,7 @@ function frames(){
 }
 
 var key = 0;
-var net = new Network(5,2,1);
+var net = new Network(2,[5,1]);
 var capturados = -10;
 speedControl = 1;
 var firstFrame = true;
