@@ -32,7 +32,7 @@ class Neuron{
         for(let i=0;i<this.length;i++){
             out += (this.weigth[i]*inputs[i]);
         }
-        return end(out);
+        return out;
     }
 }
 
@@ -176,19 +176,22 @@ function frames(){
         // captura os dados e treina a rede
         for(let i=0;i<3;i++){
             let out = net.compute([playerPosition.left, itemPosition.left]);
+            out=out[0];
             let erro = key - end(out);
-            erro *= 0.0005; // taxa de aprendizagem da rede
+            erro *= 0.0006; // taxa de aprendizagem da rede
             net.ajust(erro);
         }
     }else{
         speedControl=4;
         //usa a rede para mover o personagem
         let out = net.compute([playerPosition.left, itemPosition.left]);
+        out=out[0];
         move(end(out));
+        
     }
 
 
-    time = 5;
+    time = 6;
     setTimeout(frames,time);
 }
 
